@@ -1,0 +1,17 @@
+services:
+  circular-visit:
+    build: .
+    ports:
+      - "9000:9000"
+    environment:
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      ENABLE_OPENAI: ${ENABLE_OPENAI:-false}
+      OPENAI_MODEL: ${OPENAI_MODEL:-gpt-4.1-mini}
+    volumes:
+      - circular-visit-data:/data
+    restart: unless-stopped
+
+volumes:
+  circular-visit-data:

@@ -1,70 +1,55 @@
-# Getting Started with Create React App
+# Circular Visit
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Circular Visit is a household waste recycling appointment application. Residents can check which demonstration centres accept their items, see current slots, book a visit, and manage it afterwards. The booking assistant turns a natural-language request into suggested centres and slots. An operator workspace shows bookings and lets administrators adjust capacity and accepted waste.
 
-## Available Scripts
+## Run locally
 
-In the project directory, you can run:
+Requires Node.js 26. The local database uses Node's built-in `node:sqlite` module.
 
-### `npm start`
+```sh
+npm install
+copy .env.example .env
+npm run dev
+```
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+Open `http://localhost:3000`. The React development server proxies `/api` to the Node service on port 9000. To serve the production build from one process:
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+```sh
+npm run build
+npm run server
+```
 
-### `npm test`
+Then open `http://localhost:9000`.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+If Docker is available, `docker compose up --build` serves the same production build on port 9000 with a persistent SQLite volume. Docker is not installed in the current workspace, so this path has not been run here.
 
-### `npm run build`
+### Configuration
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Set `ADMIN_EMAIL` and `ADMIN_PASSWORD` in `.env` before first server start to create an operator account. Public registration creates resident accounts only. Set `ENABLE_OPENAI=true` and `OPENAI_API_KEY` to enable LLM extraction of waste, date, time preference and location in the assistant; `OPENAI_MODEL` defaults to `gpt-4.1-mini`. The service uses the [OpenAI Responses API structured output format](https://platform.openai.com/docs/api-reference/responses) and falls back to guided keyword extraction if the key or API is unavailable. Keys stay on the server. `DATABASE_PATH` can override the SQLite file, which defaults to `server/data/circular-visit.sqlite`.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+The UI clearly labels the three seeded centres as demonstration data. Their names, addresses, postcode area, waste rules and slots are **not live council information**. Demo booking eligibility is restricted to `RV1`–`RV3` postcodes. A real deployment needs approved centres, verified policies, geographic eligibility rules and a council booking adapter or authority to operate its own booking inventory.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## Current workflows
 
-### `npm run eject`
+- Resident registration and sign in; password hashing with scrypt and expiring server sessions.
+- Centre search and filtering by waste category.
+- Centre rules, opening days, 30 minute slots and capacity checks.
+- Resident booking, confirmation, history, cancellation and rescheduling.
+- Server-side validation of waste acceptance, postcode, vehicle and slot; immediate transaction prevents overbooking.
+- Guided assistant that collects missing information and proposes actual open slots. LLM interpretation is optional; the LLM cannot write a booking or invent availability.
+- Administrator overview, audit activity, slot capacity and accepted-waste controls.
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+The React client lives in `src/App.js`; the Node API, SQLite schema, booking logic and assistant live in `server/`. The older pathology UI files remain in the repository for reference but are no longer imported by the active app.
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## Verify
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+```sh
+npm run test:server
+npm run build
+```
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+The server test exercises registration, waste and area policy rejection, booking ownership, duplicate and capacity protection, cancellation, administrator visibility and assistant suggestions.
 
-## Learn More
+## Before a real launch
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+This is a working product prototype, not a live council service. A launch needs verified centre data and policy ownership, real availability and booking integrations, transactional email/SMS providers for confirmations and reminders, privacy and accessibility review, operational monitoring, backups, and production hosting. The shared concept’s 92% completion, 37% invalid-action reduction and 34% latency reduction are not supported by this repository; establish an evaluation set and baseline before reporting metrics.

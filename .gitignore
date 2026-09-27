@@ -10,6 +10,10 @@
 
 # production
 /build
+/server/data/
+.env
+.env.*
+!.env.example
 
 # misc
 .DS_Store

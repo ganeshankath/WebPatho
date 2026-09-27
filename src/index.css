@@ -1,13 +1,73 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 * {
   padding: 0;
   margin: 0;
   box-sizing: border-box;
 }
-.Spinner{
+
+@layer base {
+  body {
+    @apply font-sans bg-slate-50 text-slate-900 antialiased selection:bg-brand-500 selection:text-white;
+  }
+}
+
+/* Spinner Styles */
+.Spinner {
   height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 9999;
-background-color: rgba(0, 0, 0, 0.358);
+  background-color: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(4px);
+}
+
+/* Glassmorphism Panels */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05);
+}
+
+.glass-panel-dark {
+  background: rgba(19, 32, 71, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+}
+
+/* Glowing hover effects */
+.hover-glow {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.hover-glow:hover {
+  box-shadow: 0 10px 25px -5px rgba(75, 101, 235, 0.25), 0 8px 10px -6px rgba(75, 101, 235, 0.2);
+  transform: translateY(-2px);
+}
+
+/* Animated Underlines */
+.nav-link-underline {
+  position: relative;
+}
+.nav-link-underline::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  transform: scaleX(0);
+  height: 2px;
+  bottom: -4px;
+  left: 0;
+  background-color: currentColor;
+  transform-origin: bottom right;
+  transition: transform 0.25s ease-out;
+}
+.nav-link-underline:hover::after {
+  transform: scaleX(1);
+  transform-origin: bottom left;
 }
